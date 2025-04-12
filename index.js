@@ -8,18 +8,14 @@ const port = 8080;
 const server = createServer((req, res) => {
   let filePath = "." + req.url;
 
-  // Get file extension
   const extname = path.extname(filePath);
 
-  // Set content type based on file extension
   let contentType = "text/html";
   if (extname === ".css") {
     contentType = "text/css";
   }
 
-  // Handle different routes for HTML pages
   if (!extname) {
-    // If no file extension in URL
     switch (req.url) {
       case "/":
         filePath = "./index.html";
@@ -35,10 +31,8 @@ const server = createServer((req, res) => {
     }
   }
 
-  // Read the file
   fs.readFile(filePath, (error, content) => {
     if (error) {
-      // If there's an error reading the file, serve 404.html
       fs.readFile("./404.html", (err, content) => {
         res.statusCode = 404;
         res.setHeader("Content-Type", "text/html");
