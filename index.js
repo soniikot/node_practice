@@ -1,51 +1,28 @@
-const { createServer } = require("node:http");
-const fs = require("fs");
+const express = require("express");
 const path = require("path");
 
+const app = express();
+
+app.get("/", (req,res)=> {
+  res.sendFile(path.join(__dirname, "index.html"));
+})
+
+app.get("/about", (req, res) => {
+  res.sendFile(path.join(__dirname, "about.html"));
+});
+
+app.get("/contact", (req, res) => {
+  res.sendFile(path.join(__dirname, "contact-me.html"));
+});
 const hostname = "127.0.0.1";
 const port = 8080;
 
-const server = createServer((req, res) => {
-  let filePath = "." + req.url;
+app.use(express.static(__dirname));
 
-  const extname = path.extname(filePath);
-
-  let contentType = "text/html";
-  if (extname === ".css") {
-    contentType = "text/css";
-  }
-
-  if (!extname) {
-    switch (req.url) {
-      case "/":
-        filePath = "./index.html";
-        break;
-      case "/about":
-        filePath = "./about.html";
-        break;
-      case "/contact":
-        filePath = "./contact-me.html";
-        break;
-      default:
-        filePath = "./404.html";
-    }
-  }
-
-  fs.readFile(filePath, (error, content) => {
-    if (error) {
-      fs.readFile("./404.html", (err, content) => {
-        res.statusCode = 404;
-        res.setHeader("Content-Type", "text/html");
-        res.end(content);
-      });
-    } else {
-      res.statusCode = 200;
-      res.setHeader("Content-Type", contentType);
-      res.end(content);
-    }
-  });
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, "404.html"));
 });
 
-server.listen(port, hostname, () => {
+app.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
